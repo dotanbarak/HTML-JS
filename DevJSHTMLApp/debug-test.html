@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test - Speaker Dropdowns</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .debug { background: #f0f0f0; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        select { width: 100%; }
+    </style>
+</head>
+<body>
+    <h1>Debug Test - Speaker Dropdowns</h1>
+    
+    <div class="debug" id="debug-info"></div>
+    
+    <input type="file" id="fileInput" accept=".srt">
+    
+    <table id="testTable" style="display: none;">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Time</th>
+                <th>Speaker</th>
+                <th>Text</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+    </table>
+
+    <script src="js/SRTParser.js"></script>
+    <script src="js/SpeakerManager.js"></script>
+    
+    <script>
+        const debugInfo = document.getElementById('debug-info');
+        const fileInput = document.getElementById('fileInput');
+        const testTable = document.getElementById('testTable');
+        const tableBody = document.getElementById('tableBody');
+        
+        function log(message) {
+            console.log(message);
+            debugInfo.innerHTML += '<div>' + message + '</div>';
+        }
+        
+        fileInput.addEventListener('change', async (e) => {
+            if (e.target.files.length === 0) return;
+            
+            const file = e.target.files[0];
+            log('Loading file: ' + file.name);
+            
+            try {
+                const fileContent = await readFile(file);
+                log('File content length: ' + fileContent.length);
+                
+                const parser = new SRTParser();
+                const result = parser.parseFile(fileContent);
+                
+                log('Parsed entries: ' + result.entries.length);
+                log('Unique speakers: ' + result.speakers.length + ' - ' + JSON.stringify(result.speakers));
+                
+                // Clear table
+                tableBody.innerHTML = '';
+                
+                // Add first 5 entries to test
+                result.entries.slice(0, 5).forEach(entry => {
+                    const row = document.createElement('tr');
+                    
+                    const idCell = document.createElement('td');
+                    idCell.textContent = entry.id;
+                    
+                    const timeCell = document.createElement('td');
+                    timeCell.textContent = entry.startTime + ' -> ' + entry.endTime;
+                    
+                    const speakerCell = document.createElement('td');
+                    const select = createSpeakerSelect(entry, result.speakers);
+                    speakerCell.appendChild(select);
+                    
+                    const textCell = document.createElement('td');
+                    textCell.textContent = entry.text.substring(0, 50) + '...';
+                    
+                    row.appendChild(idCell);
+                    row.appendChild(timeCell);
+                    row.appendChild(speakerCell);
+                    row.appendChild(textCell);
+                    
+                    tableBody.appendChild(row);
+                });
+                
+                testTable.style.display = 'table';
+                
+            } catch (error) {
+                log('Error: ' + error.message);
+                console.error(error);
+            }
+        });
+        
+        function readFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsText(file, 'UTF-8');
+            });
+        }
+        
+        function createSpeakerSelect(entry, speakers) {
+            const select = document.createElement('select');
+            
+            log('Creating select for entry ' + entry.id + ', speaker: ' + entry.speaker);
+            log('Available speakers: ' + JSON.stringify(speakers));
+            
+            speakers.forEach(speaker => {
+                const option = document.createElement('option');
+                option.value = speaker;
+                option.textContent = speaker;
+                option.selected = speaker === entry.speaker;
+                select.appendChild(option);
+                log('Added option: ' + speaker + ' (selected: ' + (speaker === entry.speaker) + ')');
+            });
+            
+            // Add current speaker if not in list
+            if (!speakers.includes(entry.speaker)) {
+                const option = document.createElement('option');
+                option.value = entry.speaker;
+                option.textContent = entry.speaker;
+                option.selected = true;
+                select.insertBefore(option, select.firstChild);
+                log('Added missing speaker option: ' + entry.speaker);
+            }
+            
+            return select;
+        }
+    </script>
+</body>
+</html>

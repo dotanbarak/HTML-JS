@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRT Transcript Editor</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>SRT Transcript Editor</h1>
+            
+            <div class="file-section">
+                <div class="file-input-area" id="fileInputArea">
+                    <input type="file" id="fileInput" accept=".srt" hidden>
+                    <div class="drop-zone" id="dropZone">
+                        <span>Drop SRT file here or <button type="button" id="browseBtn">Browse</button></span>
+                    </div>
+                </div>
+                <div class="file-info" id="fileInfo" style="display: none;">
+                    <span id="fileName"></span>
+                    <span id="fileStats"></span>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="exportBtn" disabled>Export SRT</button>
+            </div>
+        </header>
+
+        <div class="speaker-management" id="speakerManagement" style="display: none;">
+            <h3>Speaker Management</h3>
+            <div class="speakers-list" id="speakersList"></div>
+            <div class="speaker-actions">
+                <div class="add-speaker-section">
+                    <input type="text" id="newSpeakerInput" placeholder="Enter new speaker name..." class="new-speaker-input">
+                    <button id="addSpeakerBtn">Add Speaker</button>
+                </div>
+                <button id="applySpeakerChanges">Apply Global Changes</button>
+            </div>
+        </div>
+
+        <main class="main-content">
+            <div class="table-container">
+                <table id="conversationTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Speaker</th>
+                            <th>Transcript</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <div class="status-info" id="statusInfo">
+                <span>Ready to load SRT file</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="js/SRTParser.js"></script>
+    <script src="js/ConversationManager.js"></script>
+    <script src="js/SpeakerManager.js"></script>
+    <script src="js/TableRenderer.js"></script>
+    <script src="js/FileExporter.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

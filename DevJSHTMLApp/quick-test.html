@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head><title>Quick Speaker Test</title></head>
+<body>
+    <script src="js/SRTParser.js"></script>
+    <script>
+        const testSRT = `1
+00:00:01,000 --> 00:00:03,000
+Speaker 1: First text
+
+2
+00:00:03,000 --> 00:00:05,000
+Speaker 2: Second text
+
+3
+00:00:05,000 --> 00:00:07,000
+Speaker 3: Third text
+
+4
+00:00:07,000 --> 00:00:09,000
+Speaker 1: Fourth text`;
+
+        const parser = new SRTParser();
+        const result = parser.parseFile(testSRT);
+        
+        console.log('Parsed entries:', result.entries.length);
+        console.log('Speakers found:', result.speakers);
+        console.log('First entry speaker:', result.entries[0].speaker);
+        console.log('Second entry speaker:', result.entries[1].speaker);
+        console.log('Third entry speaker:', result.entries[2].speaker);
+        console.log('Fourth entry speaker:', result.entries[3].speaker);
+        
+        // Test with actual file content
+        fetch('./2025-08-13_18-19-15_with diarization of 5_-_BAD.srt')
+            .then(response => response.text())
+            .then(content => {
+                const realResult = parser.parseFile(content);
+                console.log('Real file - Entries:', realResult.entries.length);
+                console.log('Real file - Speakers:', realResult.speakers);
+                console.log('Real file - First 10 speakers:', realResult.entries.slice(0, 10).map(e => e.speaker));
+            })
+            .catch(err => console.log('Could not load real file:', err));
+    </script>
+</body>
+</html>

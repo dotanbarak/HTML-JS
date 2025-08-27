@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRT Editor - Unit Tests</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #569cd6;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .console-output {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 20px;
+            min-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .run-tests-btn {
+            background-color: #238636;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .run-tests-btn:hover {
+            background-color: #2ea043;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 SRT Editor Unit Tests</h1>
+        
+        <button class="run-tests-btn" onclick="runAllTests()">▶️ Run All Tests</button>
+        
+        <div class="console-output" id="console"></div>
+    </div>
+
+    <!-- Load application classes first -->
+    <script src="../js/SRTParser.js"></script>
+    <script src="../js/SpeakerManager.js"></script>
+    <script src="../js/ConversationManager.js"></script>
+    <script src="../js/FileExporter.js"></script>
+    
+    <!-- Load test framework and data -->
+    <script src="test-framework.js"></script>
+    <script src="test-data.js"></script>
+    
+    <!-- Load test files -->
+    <script src="srt-parser.test.js"></script>
+    <script src="speaker-manager.test.js"></script>
+    <script src="conversation-manager.test.js"></script>
+    <script src="file-exporter.test.js"></script>
+
+    <script>
+        // Capture console output
+        const originalLog = console.log;
+        const consoleElement = document.getElementById('console');
+        
+        console.log = function(...args) {
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            consoleElement.textContent += message + '\n';
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+            
+            originalLog.apply(console, args);
+        };
+
+        function runAllTests() {
+            consoleElement.textContent = '';
+            console.log('🚀 Starting SRT Editor Unit Tests...\n');
+            
+            const testFramework = new TestFramework();
+            
+            // Note: Tests will run automatically when the page loads
+            // This button just clears and re-runs them
+            
+            setTimeout(() => {
+                console.log('\n🏁 All tests completed!');
+                testFramework.printSummary();
+            }, 1000);
+        }
+
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                runAllTests();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
